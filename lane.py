@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Wed Jun  9 17:16:19 2021
 
@@ -15,7 +14,7 @@ import math
 
 
 #reading in an image
-image_bgr = cv2.imread('00001_image.png')
+image_bgr = cv2.imread('00032_image.png')
 image = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 
 print('This image is:', type(image), 'with dimensions:', image.shape)
@@ -93,7 +92,7 @@ height, width = image.shape[:2]
 kernel_size = 3     
 low_threshold = 100 
 high_threshold = 200
-vertices = np.array([[[0,height], [width-50,height],[width/2+40, height/2+50],[width/2-40, height/2+50]]], dtype=np.int32)
+vertices = np.array([[[0,height], [width,height],[width, height/2+50],[0, height/2+50]]], dtype=np.int32)
 min_line_len = 100
 max_line_gap = 150
 
@@ -102,31 +101,39 @@ max_line_gap = 150
 #gray_img = grayscale(image)
 
 blur_img = gaussian_blur(image,kernel_size)
-canny_img = canny(blur_img,150,300)
+canny_img = canny(blur_img,100,200)
+
+roi_img = region_of_interest(canny_img, vertices)
+plt.imshow(roi_img,cmap='gray'),plt.title('ROI')
+plt.figure()
+
+line_img,line_arr = hough_lines(roi_img, 1, 1 * np.pi/180, 120, min_line_len, max_line_gap) 
+plt.imshow(line_img),plt.title('hough')
+plt.figure()
+
+result = weighted_img(line_img, image) 
+plt.imshow(result),plt.title('result')
+plt.figure()
 
 
+
+'''
 plt.subplot(1,2,1)
 plt.imshow(canny_img,cmap='gray'),plt.title('canny edge')
 
-line_img2,line_arr2 = hough_lines(canny_img, 1, 1 * np.pi/180, 120, min_line_len, max_line_gap)
+line_img2,line_arr2 = hough_lines(canny_img, 0.8, 1 * np.pi/180, 120, min_line_len, max_line_gap)
 plt.subplot(1,2,2)
 plt.imshow(line_img2),plt.title('hough2')
 
 plt.figure()
 
+
 #roi
 H=240
 W=640
-roi_area = canny_img[280:H+240,:W]
+roi_area = canny_img[280:H+240,50:W]
+'''
 
-plt.imshow(roi_area,cmap='gray'),plt.title('ROI')
-plt.figure()
-line_img,line_arr = hough_lines(roi_area, 1, 1 * np.pi/180, 120, min_line_len, max_line_gap) 
- 
-
-
-plt.imshow(line_img),plt.title('hough')
-plt.figure()
 
 
 
