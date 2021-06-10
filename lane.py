@@ -20,6 +20,7 @@ image = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 
 print('This image is:', type(image), 'with dimensions:', image.shape)
 plt.imshow(image)
+plt.figure()
 
 def grayscale(img):
     return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -94,7 +95,7 @@ low_threshold = 100
 high_threshold = 200
 vertices = np.array([[[0,height], [width-50,height],[width/2+40, height/2+50],[width/2-40, height/2+50]]], dtype=np.int32)
 min_line_len = 100
-max_line_gap = 200
+max_line_gap = 150
 
 
 
@@ -103,20 +104,29 @@ max_line_gap = 200
 blur_img = gaussian_blur(image,kernel_size)
 canny_img = canny(blur_img,150,300)
 
-plt.figure()
+
+plt.subplot(1,2,1)
 plt.imshow(canny_img,cmap='gray'),plt.title('canny edge')
 
+line_img2,line_arr2 = hough_lines(canny_img, 1, 1 * np.pi/180, 120, min_line_len, max_line_gap)
+plt.subplot(1,2,2)
+plt.imshow(line_img2),plt.title('hough2')
+
+plt.figure()
 
 #roi
 H=240
 W=640
 roi_area = canny_img[280:H+240,:W]
-plt.figure()
-plt.imshow(roi_area,cmap='gray'),plt.title('ROI')
 
-line_img,line_arr = hough_lines(roi_area, 1, 1 * np.pi/180, 30, min_line_len, max_line_gap) 
+plt.imshow(roi_area,cmap='gray'),plt.title('ROI')
 plt.figure()
+line_img,line_arr = hough_lines(roi_area, 1, 1 * np.pi/180, 120, min_line_len, max_line_gap) 
+ 
+
+
 plt.imshow(line_img),plt.title('hough')
+plt.figure()
 
 
 
