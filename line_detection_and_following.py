@@ -40,30 +40,61 @@ def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap):
     return line_img,lines
 
 
-#################################-----roi
-#roi_img = img[280:480,:640]
 
-#======================== bird eye view
 
-roi_img = img_plt[280:480,:640]
-plt.imshow(img_plt)
+#################################----hsv
+img_hsv = cv2.cvtColor(img_plt, cv2.COLOR_RGB2HSV)
+# HSV; RED color range values; 
+lower1 = np.array([160,50,25])
+upper1 = np.array([180,255,255])
+
+
+# RGB; yellow color range values; 
+lower2 = np.array([17,120,120])
+upper2 = np.array([38,255,255])
+
+red_mask = cv2.inRange(img_hsv, lower1, upper1)
+yellow_mask = cv2.inRange(img_hsv,lower2,upper2)
+
+full_mask = red_mask + yellow_mask;
+
+img_result = cv2.bitwise_and(result, result, mask = full_mask)
+
+canny_img = canny(img_result,100,200)
+
+
+plt.subplot(1,2,2)
+plt.imshow(canny_img,cmap='gray'),plt.title('canny')
 plt.figure()
-plt.imshow(roi_img)
+#======================== roi
+
+roi_img = canny_img[280:480,:640]
+roi_img2 = img_plt[280:480,:640]
+
+plt.imshow(roi_img,cmap='gray'),plt.title('roi')
 plt.figure()
 height, width = roi_img.shape[:2]
 print(height)
 print(width)
-
-pts2 = np.float32([[245, 0], [40,height],[430, 0],[width,height]])
-pts1 = np.float32([[0, 0], [0, height] , [width, 0],[width, height]])    #ori_coordi
+#=========== bird eye view
+pts2 = np.float32([[0, 200], [600,200],[0, 0],[width,0]])
+pts1 = np.float32([[235,200], [400, 200] , [0, 0],[width, 0]])   
 
 
 M = cv2.getPerspectiveTransform(pts2,pts1)
 
-warped_img = cv2.warpPerspective(roi_img, M, (width+10 ,height))
-plt.imshow(warped_img),plt.title('warped_img')
+warped_img = cv2.warpPerspective(roi_img, M, (width ,height))
+warped_img2 = cv2.warpPerspective(roi_img2, M, (width ,height))
+
+plt.imshow(warped_img,cmap='gray'),plt.title('warped_img')
+plt.imshow(warped_img2),plt.title('warped_img2')
 plt.figure()
 
+################################-----hough
+line_img,line_arr = hough_lines(warped_img, 1, 1 * np.pi/180, 30, 50, 300) 
+
+plt.imshow(line_img),plt.title('hough')
+plt.figure()
 
 
 
