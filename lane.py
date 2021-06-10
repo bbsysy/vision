@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Wed Jun  9 17:16:19 2021
 
@@ -10,11 +11,11 @@ import matplotlib.image as mpimg
 import numpy as np
 import cv2,os
 import math
+import glob
 
 
 
-#reading in an image
-image_bgr = cv2.imread('00032_image.png')
+image_bgr = cv2.imread('00001_image.png')
 image = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 
 print('This image is:', type(image), 'with dimensions:', image.shape)
@@ -92,7 +93,7 @@ height, width = image.shape[:2]
 kernel_size = 3     
 low_threshold = 100 
 high_threshold = 200
-vertices = np.array([[[0,height], [width,height],[width, height/2+50],[0, height/2+50]]], dtype=np.int32)
+vertices = np.array([[[0,height], [width,height],[width/2+150, height/2+50],[width/2-90, height/2+50]]], dtype=np.int32)
 min_line_len = 100
 max_line_gap = 150
 
@@ -134,40 +135,3 @@ W=640
 roi_area = canny_img[280:H+240,50:W]
 '''
 
-
-
-
-'''
-def line_finding(img):
-    temp_img = np.zeros((image.shape[0], image.shape[1], 3), dtype=np.uint8)
-    
-    #gray_img = grayscale(image)
-    blur_img = gaussian_blur(img,kernel_size)
-    canny_img = canny(blur_img, low_threshold,high_threshold)
-   
-
-    roi_img = region_of_interest(canny_img, vertices)
-    line_img,line_arr = hough_lines(roi_img, 1, 1 * np.pi/180, 30, min_line_len, max_line_gap) 
-    
-    L_line , R_line = left_right(line_arr)
-    L_line = Representative_line(img,L_line)
-    R_line = Representative_line(img,R_line)
-    
-  
-    draw_lines(temp_img, L_line ,thickness=5)
-    draw_lines(temp_img, R_line ,thickness=5)
-    
-    result = weighted_img(temp_img, img) 
-    
-    
-    img_arr = [img , blur_img , canny_img , roi_img, line_img , line_arr ]
-    for i in range(len(img_arr)):
-        if i == 0 and i == 6:
-            plt.figure()
-            plt.imshow(img_arr[i])
-        else:
-            plt.figure()
-            plt.imshow(img_arr[i], cmap='gray') 
-    
-line_finding(image)
-'''
